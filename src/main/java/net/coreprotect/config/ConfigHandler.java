@@ -47,7 +47,7 @@ public class ConfigHandler extends Queue {
 
     public static int SERVER_VERSION = 0;
     public static final int EDITION_VERSION = 2;
-    public static final String EDITION_BRANCH = VersionUtils.getBranch();
+    public static final String EDITION_BRANCH = "development";
     public static final String EDITION_NAME = VersionUtils.getPluginName();
     public static final String COMMUNITY_EDITION = "Community Edition";
     public static final String JAVA_VERSION = "11.0";
