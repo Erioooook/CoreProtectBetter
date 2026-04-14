@@ -1,7 +1,12 @@
 package net.coreprotect.listener.entity;
 
 import org.bukkit.Location;
-import org.bukkit.entity.*;
+import org.bukkit.Material;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,72 +29,62 @@ public class MobOriginLogger implements Listener {
         return "unknown";
     }
 
-    private void log(String prefix, Entity mob, Location loc) {
+    private void log(Entity mob, Location loc, String type) {
         String mobName = mob.getType().name();
         String target = getTargetName(mob);
-        String tag = "#" + mobName + "-" + target + "-" + prefix;
 
-        Queue.queueCustom(tag, loc);
+        String user = mobName + "-" + target + "-" + type;
+
+        BlockState fake = loc.getBlock().getState();
+
+        Queue.queueBlockBreak(user, fake, Material.AIR, "air", 0);
     }
 
-    // -----------------------------
-    // EXPLOSIONS (Ghast, Creeper, Wither, EnderDragon, etc.)
-    // -----------------------------
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMobExplosion(EntityExplodeEvent event) {
-        Entity source = event.getEntity();
-
-        if (source instanceof Mob || source instanceof Explosive) {
-            log("explosion", source, event.getLocation());
+    public void onExplosion(EntityExplodeEvent event) {
+        Entity e = event.getEntity();
+        if (e instanceof Mob) {
+            log(e, event.getLocation(), "explosion");
         }
     }
 
-    // -----------------------------
-    // FIRE (Ghast fireball, Blaze fireball, Wither skull)
-    // -----------------------------
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMobFire(BlockIgniteEvent event) {
-        Entity igniter = event.getIgnitingEntity();
-        if (igniter == null) return;
+    public void onIgnite(BlockIgniteEvent event) {
+        Entity e = event.getIgnitingEntity();
+        if (e == null) return;
 
-        if (igniter instanceof Projectile) {
-            Projectile p = (Projectile) igniter;
+        if (e instanceof Projectile) {
+            Projectile p = (Projectile) e;
             if (p.getShooter() instanceof Entity) {
-                igniter = (Entity) p.getShooter();
+                e = (Entity) p.getShooter();
             }
         }
 
-        if (igniter instanceof Mob) {
-            log("fire", igniter, event.getBlock().getLocation());
+        if (e instanceof Mob) {
+            log(e, event.getBlock().getLocation(), "fire");
         }
     }
 
-    // -----------------------------
-    // BLOCK DESTRUCTION (Enderman, Ravager, Wither, Dragon)
-    // -----------------------------
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMobBlockChange(EntityChangeBlockEvent event) {
-        Entity entity = event.getEntity();
-
-        if (entity instanceof Mob || entity instanceof EnderDragon) {
-            log("destruction", entity, event.getBlock().getLocation());
+    public void onBlockChange(EntityChangeBlockEvent event) {
+        Entity e = event.getEntity();
+        if (e instanceof Mob) {
+            log(e, event.getBlock().getLocation(), "destruction");
         }
     }
 
-    // -----------------------------
-    // PROJECTILE IMPACT (fireballs, wither skulls)
-    // -----------------------------
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onProjectileImpact(ProjectileHitEvent event) {
-        Projectile projectile = event.getEntity();
-
-        if (projectile.getShooter() instanceof Entity) {
-            Entity shooter = (Entity) projectile.getShooter();
-
+    public void onProjectileHit(ProjectileHitEvent event) {
+        Projectile p = event.getEntity();
+        if (p.getShooter() instanceof Entity) {
+            Entity shooter = (Entity) p.getShooter();
             if (shooter instanceof Mob) {
-                Location loc = projectile.getLocation();
-                log("projectile", shooter, loc);
+                log(shooter, p.getLocation(), "projectile");
             }
+        }
+    }
+}
+
         }
     }
 }
