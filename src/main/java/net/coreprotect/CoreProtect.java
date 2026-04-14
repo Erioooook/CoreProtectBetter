@@ -4,6 +4,10 @@ import java.io.File;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+// Добавленные импорты для слушателя и hook
+import net.coreprotect.listener.PressurePlateListener;
+import net.coreprotect.integrations.SimpleCoreProtectHook;
+
 import net.coreprotect.config.ConfigHandler;
 import net.coreprotect.language.Phrase;
 import net.coreprotect.services.PluginInitializationService;
@@ -45,6 +49,7 @@ public final class CoreProtect extends JavaPlugin {
         ConfigHandler.path = this.getDataFolder().getPath() + File.separator;
 
         advancedChestsEnabled = getServer().getPluginManager().getPlugin("AdvancedChests") != null;
+
         // Initialize plugin using the initialization service
         boolean initialized = PluginInitializationService.initializePlugin(this);
 
@@ -52,7 +57,12 @@ public final class CoreProtect extends JavaPlugin {
         if (!initialized) {
             Chat.console(Phrase.build(Phrase.ENABLE_FAILED, ConfigHandler.EDITION_NAME));
             getServer().getPluginManager().disablePlugin(this);
+            return; // важно: не продолжать инициализацию
         }
+
+        // Регистрация слушателя для плит (после успешной инициализации)
+        SimpleCoreProtectHook hook = new SimpleCoreProtectHook();
+        getServer().getPluginManager().registerEvents(new PressurePlateListener(this, hook), this);
     }
 
     @Override
