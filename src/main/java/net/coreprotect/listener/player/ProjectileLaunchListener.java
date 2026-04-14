@@ -63,29 +63,28 @@ public final class ProjectileLaunchListener extends Queue implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     protected void onProjectileLaunch(ProjectileLaunchEvent event) {
 
-        // ------------------------------
-        // ✔ WIND CHARGE SUPPORT
-        // ------------------------------
-        if (event.getEntity() instanceof WindCharge && event.getEntity().getShooter() instanceof Player player) {
+        // WIND CHARGE SUPPORT (Java 11)
+        if (event.getEntity() instanceof WindCharge) {
 
-            ItemStack item = new ItemStack(Material.WIND_CHARGE);
+            Object shooter = event.getEntity().getShooter();
+            if (shooter instanceof Player) {
+                Player player = (Player) shooter;
 
-            playerLaunchProjectile(
-                event.getEntity().getLocation(),
-                player.getName(),
-                item,
-                1,
-                0,
-                0,
-                ItemLogger.ITEM_THROW
-            );
+                ItemStack item = new ItemStack(Material.WIND_CHARGE);
 
-            return; // done
+                playerLaunchProjectile(
+                    event.getEntity().getLocation(),
+                    player.getName(),
+                    item,
+                    1,
+                    0,
+                    0,
+                    ItemLogger.ITEM_THROW
+                );
+            }
         }
 
-        // ------------------------------
-        // ✔ ORIGINAL COREGUARD LOGIC
-        // ------------------------------
+        // ORIGINAL COREGUARD LOGIC
         Location location = event.getEntity().getLocation();
         String key = location.getWorld().getName() + "-" + location.getBlockX() + "-" + location.getBlockY() + "-" + location.getBlockZ();
         Iterator<Entry<String, Object[]>> it = ConfigHandler.entityBlockMapper.entrySet().iterator();
