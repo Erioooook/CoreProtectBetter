@@ -115,6 +115,7 @@ public final class ListenerHandler {
         pluginManager.registerEvents(new HangingPlaceListener(), plugin);
         pluginManager.registerEvents(new HangingBreakListener(), plugin);
         pluginManager.registerEvents(new HangingBreakByEntityListener(), plugin);
+        pluginManager.registerEvents(new MobOriginLogger(), plugin);
 
         // Paper Listeners / Fallbacks (Player Listeners)
         try {
