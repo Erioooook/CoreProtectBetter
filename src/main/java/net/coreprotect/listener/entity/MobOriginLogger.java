@@ -17,7 +17,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 
 import net.coreprotect.consumer.Queue;
 
-public class MobOriginLogger implements Listener {
+public class MobOriginLogger extends Queue implements Listener {
 
     private String getTargetName(Entity entity) {
         if (entity instanceof Mob) {
@@ -32,12 +32,10 @@ public class MobOriginLogger implements Listener {
     private void log(Entity mob, Location loc, String type) {
         String mobName = mob.getType().name();
         String target = getTargetName(mob);
-
         String user = mobName + "-" + target + "-" + type;
 
         BlockState fake = loc.getBlock().getState();
-
-        Queue.queueBlockBreak(user, fake, Material.AIR, "air", 0);
+        queueBlockBreak(user, fake, Material.AIR, "air", 0);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -81,10 +79,6 @@ public class MobOriginLogger implements Listener {
             if (shooter instanceof Mob) {
                 log(shooter, p.getLocation(), "projectile");
             }
-        }
-    }
-}
-
         }
     }
 }
