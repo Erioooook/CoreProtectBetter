@@ -46,6 +46,7 @@ import net.coreprotect.bukkit.BukkitAdapter;
 import net.coreprotect.config.Config;
 import net.coreprotect.config.ConfigHandler;
 import net.coreprotect.consumer.Queue;
+import net.coreprotect.database.logger.ItemLogger;
 import net.coreprotect.language.Phrase;
 import net.coreprotect.listener.block.CampfireStartListener;
 import net.coreprotect.listener.player.inspector.BlockInspector;
@@ -700,6 +701,26 @@ public final class PlayerInteractListener extends Queue implements Listener {
 
                 Queue.queueBlockBreak(player.getName(), block.getState(), block.getType(), block.getBlockData().getAsString(), 0);
                 Queue.queueBlockPlaceDelayed(player.getName(), block.getLocation(), block.getType(), null, null, 0);
+                if (event.getHand() == EquipmentSlot.HAND && event.hasItem()) {
+    Material type = event.getItem().getType();
+
+    if (type == Material.EGG
+        || type == Material.SNOWBALL
+        || type == Material.ENDER_PEARL
+        || type == Material.WIND_CHARGE) {
+
+        ProjectileLaunchListener.playerLaunchProjectile(
+            player.getLocation(),
+            player.getName(),
+            event.getItem(),
+            1,
+            0,
+            0,
+            ItemLogger.ITEM_THROW
+        );
+    }
+}
+
             }
         }
     }
